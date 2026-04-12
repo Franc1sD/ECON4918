@@ -1,1 +1,155 @@
-# ECON4918
+# Attention Before Action: Google Search and Nvidia Stock Returns
+
+**ECON 4918 — Empirical Research Paper**
+Francis Deng · Spring 2026
+
+---
+
+## Overview
+
+This paper examines whether retail investor attention — proxied by Google Search volume — predicts Nvidia (NVDA) weekly stock returns, and whether large return movements in turn drive search activity. The analysis centers on a two-equation VAR system and tests whether this attention-return relationship structurally changed after the launch of ChatGPT in November 2022, which dramatically increased public interest in AI and Nvidia.
+
+**Research Questions**
+1. Does Google search volume for Nvidia Granger-cause its weekly stock returns?
+2. Do Nvidia returns Granger-cause subsequent search activity (feedback loop)?
+3. Did the attention-return relationship strengthen after ChatGPT's launch (Nov 2022)?
+
+**Hypotheses**
+- **H1:** Search volume Granger-causes NVDA returns — lagged search predicts returns even controlling for past returns and market-wide factors.
+- **H2:** The relationship strengthened post-ChatGPT — the coefficient on search volume and/or Granger causality p-values improve significantly in the post-2022 subsample.
+
+---
+
+## Data
+
+| Variable | Source | Frequency | Period |
+|---|---|---|---|
+| NVDA stock price & volume | Yahoo Finance | Daily → Weekly | Jan 2019 – Dec 2024 |
+| Nasdaq-100 index (^NDX) | Yahoo Finance | Daily → Weekly | Jan 2019 – Dec 2024 |
+| VIX (market uncertainty) | Yahoo Finance | Daily → Weekly | Jan 2019 – Dec 2024 |
+| Google Trends: "NVDA" | Google Trends (via pytrends) | Weekly | Jan 2019 – Dec 2024 |
+| Google Trends: "buy nvidia stock" | Google Trends (via pytrends) | Weekly | Jan 2019 – Dec 2024 |
+
+**Key constructed variables:**
+- `nvda_ret` — log weekly return of NVDA
+- `nvda_idret` — idiosyncratic return (NVDA minus NDX)
+- `dgtrend_nvda` — first difference of Google Trends index (stationary)
+- `post_chatgpt` — dummy = 1 after 2022-11-30
+- `absgtrend` — absolute attention change (attention spike measure)
+
+---
+
+## Repository Structure
+
+```
+ECON4918/
+├── scripts/
+│   ├── 01_fetch_data.py       # Fetch Yahoo Finance + Google Trends → data/raw/
+│   └── 02_build_dataset.py    # Clean, merge, export → data/processed/weekly_panel.dta
+│
+├── analysis/
+│   ├── 00_main.do             # Master do-file — runs all modules
+│   ├── 01_pretests.do         # Unit root (ADF, KPSS), structural breaks, ARCH
+│   ├── 02_var_main.do         # Full-sample VAR, Granger causality, IRF, FEVD
+│   ├── 03_subsample.do        # Pre/post ChatGPT subsamples + Wald stability test
+│   ├── 04_oos_forecast.do     # Recursive OOS: AR vs. VAR, Clark-West test
+│   └── 05_robustness.do       # Alt. keyword, alt. lags, idiosyncratic returns, interactions
+│
+├── data/
+│   ├── raw/                   # Raw CSVs (gitignored — regenerate with 01_fetch_data.py)
+│   └── processed/             # weekly_panel.csv / .dta (gitignored — regenerate with 02_build_dataset.py)
+│
+├── results/
+│   ├── figures/               # PNG exports (tracked in git)
+│   └── *.tex                  # LaTeX tables (tracked in git)
+│
+└── README.md
+```
+
+---
+
+## Replication
+
+### Step 1 — Python environment
+
+```bash
+conda activate base          # or your preferred env
+pip install yfinance pytrends pandas numpy
+```
+
+### Step 2 — Fetch raw data
+
+```bash
+python scripts/01_fetch_data.py
+```
+
+Downloads daily Yahoo Finance data and stitches two Google Trends windows. Takes ~2 minutes (rate-limiting on Trends API).
+
+### Step 3 — Build Stata dataset
+
+```bash
+python scripts/02_build_dataset.py
+```
+
+Outputs `data/processed/weekly_panel.dta` (311 weekly observations, 11 variables).
+
+### Step 4 — Run Stata analysis
+
+**Option A — Full pipeline (batch mode):**
+```bash
+stata -b do analysis/00_main.do
+```
+
+**Option B — Run individual modules in Stata GUI:**
+```stata
+global root "."                    // set from project root
+do "analysis/01_pretests.do"
+do "analysis/02_var_main.do"
+do "analysis/03_subsample.do"
+do "analysis/04_oos_forecast.do"
+do "analysis/05_robustness.do"
+```
+
+**First-time Stata users:** install required packages:
+```stata
+ssc install estout     // for esttab (result tables)
+ssc install kpss       // for KPSS stationarity test
+ssc install coefplot   // for coefficient comparison plot
+```
+
+---
+
+## Methodology
+
+### VAR System
+
+The core model is a bivariate VAR with exogenous controls:
+
+**Equation 1 (Return equation):**
+$$r_t^{NVDA} = \alpha_1 + \sum_{k=1}^{p} \beta_k r_{t-k}^{NVDA} + \sum_{k=1}^{p} \gamma_k \Delta S_{t-k} + \delta' \mathbf{X}_t + \varepsilon_{1t}$$
+
+**Equation 2 (Search equation):**
+$$\Delta S_t = \alpha_2 + \sum_{k=1}^{p} \phi_k r_{t-k}^{NVDA} + \sum_{k=1}^{p} \psi_k \Delta S_{t-k} + \lambda' \mathbf{X}_t + \varepsilon_{2t}$$
+
+where $r_t^{NVDA}$ is the log weekly return, $\Delta S_t$ is the first-differenced Google Trends index, and $\mathbf{X}_t = (\text{NDX return}, \text{VIX}, \log\text{Volume}, \text{post\_chatgpt})$.
+
+### Pre-estimation Checks
+- ADF and KPSS unit root tests (Google Trends in levels → unit root → first-differenced)
+- Quandt-Andrews unknown structural break test
+- Chow test at Nov 2022
+- ARCH-LM test for volatility clustering
+
+### Post-estimation
+- Granger causality (bidirectional, `vargranger`)
+- Orthogonalized IRFs (Cholesky ordering: ΔSearch → Return)
+- Forecast Error Variance Decomposition (FEVD)
+- Recursive OOS forecasting with Clark-West (2006) test
+
+---
+
+## Key References
+
+- Da, Z., Engelberg, J., & Gao, P. (2011). In search of attention. *Journal of Finance*, 66(5), 1461–1499.
+- Baker, M., & Wurgler, J. (2007). Investor sentiment in the stock market. *Journal of Economic Perspectives*, 21(2), 129–151.
+- Clark, T. E., & West, K. D. (2006). Using out-of-sample mean squared prediction errors to test the martingale difference hypothesis. *Journal of Econometrics*, 135(1–2), 155–186.
+- Vlastakis, N., & Markellos, R. N. (2012). Information demand and stock market volatility. *Journal of Banking & Finance*, 36(6), 1808–1821.
