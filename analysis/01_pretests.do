@@ -16,9 +16,10 @@ Pre-estimation diagnostics
 use "$data/weekly_panel.dta", clear
 
 * ── Set time series ──────────────────────────────────────────────────────────
-gen week = wofd(date)
-format week %tw
-tsset week
+* Observations are weekly Fridays — use daily date with 7-day delta.
+* (wofd() can produce duplicate week values for Friday dates near week boundaries)
+format date %td
+tsset date, delta(7)
 
 * ── 1. Summary Statistics ────────────────────────────────────────────────────
 di _newline "--- SUMMARY STATISTICS ---"
@@ -62,23 +63,23 @@ if _rc != 0 di "  kpss not installed. Run: ssc install kpss"
 * ── 4. Time-Series Plots ─────────────────────────────────────────────────────
 * Returns and search volume over time
 
-twoway (line nvda_ret week, lcolor(navy) lwidth(thin)) ///
-       (line ndx_ret  week, lcolor(cranberry) lwidth(thin) lpattern(dash)), ///
+twoway (line nvda_ret date, lcolor(navy) lwidth(thin)) ///
+       (line ndx_ret  date, lcolor(cranberry) lwidth(thin) lpattern(dash)), ///
     xline(`=$breakdate', lcolor(red) lwidth(medthick) lpattern(shortdash)) ///
     legend(order(1 "NVDA return" 2 "NDX return") position(6) rows(1)) ///
     xtitle("") ytitle("Log weekly return") ///
     title("Weekly Returns: NVDA vs. Nasdaq-100") ///
     note("Vertical line = ChatGPT launch (Nov 2022)") ///
-    xlabel(, format(%twMon_YY) angle(45)) ///
+    xlabel(, format(%tdMon_YY) angle(45)) ///
     scheme(s2color)
 graph export "$figs/fig1_returns.png", replace width(2400)
 
-twoway (line gtrend_nvda week, lcolor(dkgreen) lwidth(thin)), ///
+twoway (line gtrend_nvda date, lcolor(dkgreen) lwidth(thin)), ///
     xline(`=$breakdate', lcolor(red) lwidth(medthick) lpattern(shortdash)) ///
     xtitle("") ytitle("Search Index (0–100)") ///
     title("Google Trends: NVDA Search Volume") ///
     note("Vertical line = ChatGPT launch (Nov 2022)") ///
-    xlabel(, format(%twMon_YY) angle(45)) ///
+    xlabel(, format(%tdMon_YY) angle(45)) ///
     scheme(s2color)
 graph export "$figs/fig2_gtrends.png", replace width(2400)
 
@@ -100,7 +101,12 @@ di ""
 reg nvda_ret L(1/2).nvda_ret L(1/2).dgtrend_nvda $controls
 
 * Quandt-Andrews test (requires Stata 14+)
-estat sbsingle
+* trim(0.20) avoids collinearity in very small boundary sub-samples
+capture estat sbsingle, trim(0.20)
+if _rc != 0 {
+    di "  Note: estat sbsingle failed (r(`_rc')). Try a simpler specification."
+    di "  Falling back to manual Chow test below."
+}
 
 * ── 6. Chow Test at ChatGPT Launch ──────────────────────────────────────────
 di _newline "--- CHOW TEST AT 2022w48 (ChatGPT launch) ---"

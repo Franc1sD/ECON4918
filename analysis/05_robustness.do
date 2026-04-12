@@ -14,9 +14,8 @@ Robustness checks
 
 use "$data/weekly_panel.dta", clear
 
-gen week = wofd(date)
-format week %tw
-tsset week
+format date %td
+tsset date, delta(7)
 
 local p = 2    // baseline lag order
 
@@ -121,9 +120,6 @@ esttab eq1_buy eq1_p1 eq1_p4 eq1_idret using "$results/table5_robustness.tex", /
     label replace booktabs ///
     title("Robustness Checks — Return Equation") ///
     mtitles("Alt. keyword" "VAR(1)" "VAR(4)" "Idiosyncratic ret.") ///
-    keep(L1.dgtrend_nvda L2.dgtrend_nvda L1.dgtrend_buy L2.dgtrend_buy ///
-         L1.nvda_ret L2.nvda_ret L1.nvda_idret L2.nvda_idret ///
-         ndx_ret vix log_vol post_chatgpt _cons) ///
     note("Standard errors in parentheses. * p<0.10, ** p<0.05, *** p<0.01." ///
          "All models estimated with OLS on the return equation.")
 

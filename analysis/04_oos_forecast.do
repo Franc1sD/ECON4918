@@ -22,9 +22,8 @@ included in both models as available end-of-week information.
 
 use "$data/weekly_panel.dta", clear
 
-gen week = wofd(date)
-format week %tw
-tsset week
+format date %td
+tsset date, delta(7)
 
 local p    = 2                        // lag order
 local nobs = _N
@@ -118,11 +117,11 @@ di "p-value (one-sided, normal approx): " ///
 * ── Pre / Post ChatGPT split ─────────────────────────────────────────────────
 di _newline "--- OOS EVALUATION BY PERIOD ---"
 
-local breakdate = weekly("2022w48", "YW")
+local breakdate = date("2022-11-30", "YMD")
 
 foreach period in pre post {
-    if "`period'" == "pre"  local cond "week < `breakdate' & !missing(e_ar)"
-    if "`period'" == "post" local cond "week >= `breakdate' & !missing(e_ar)"
+    if "`period'" == "pre"  local cond "date < `breakdate' & !missing(e_ar)"
+    if "`period'" == "post" local cond "date >= `breakdate' & !missing(e_ar)"
 
     quietly sum e_ar2  if `cond'
     local m_ar = r(mean)
@@ -140,14 +139,14 @@ foreach period in pre post {
 gen cum_e_ar2  = sum(e_ar2)  / _n if !missing(e_ar)
 gen cum_e_var2 = sum(e_var2) / _n if !missing(e_var)
 
-twoway (line cum_e_ar2  week if !missing(e_ar), lcolor(navy) lwidth(medthick)) ///
-       (line cum_e_var2 week if !missing(e_var), lcolor(cranberry) lwidth(medthick) lpattern(dash)), ///
+twoway (line cum_e_ar2  date if !missing(e_ar), lcolor(navy) lwidth(medthick)) ///
+       (line cum_e_var2 date if !missing(e_var), lcolor(cranberry) lwidth(medthick) lpattern(dash)), ///
     xline(`=`breakdate'', lcolor(red) lwidth(thin) lpattern(shortdash)) ///
     legend(order(1 "AR (no search)" 2 "VAR (with search)") position(6) rows(1)) ///
     xtitle("") ytitle("Cumulative MSFE") ///
     title("Out-of-Sample Forecast Accuracy: AR vs. VAR") ///
     note("Vertical line = ChatGPT launch (Nov 2022)") ///
-    xlabel(, format(%twMon_YY) angle(45)) ///
+    xlabel(, format(%tdMon_YY) angle(45)) ///
     scheme(s2color)
 graph export "$figs/fig10_oos_msfe.png", replace width(2400)
 

@@ -18,24 +18,23 @@ Steps:
 
 use "$data/weekly_panel.dta", clear
 
-gen week = wofd(date)
-format week %tw
-tsset week
+format date %td
+tsset date, delta(7)
 
 local p = 2    // lag order (consistent with 02_var_main.do)
 
 * ── 1. Split ─────────────────────────────────────────────────────────────────
-* ChatGPT launched November 30, 2022 → Stata week 2022w48
-local breakdate = weekly("2022w48", "YW")
+* ChatGPT launched November 30, 2022
+local breakdate = date("2022-11-30", "YMD")
 
 * ── 2–3. VAR + Granger per subsample ────────────────────────────────────────
 foreach period in "pre" "post" {
     if "`period'" == "pre" {
-        local cond "week < `breakdate'"
+        local cond "date < `breakdate'"
         local title "Pre-ChatGPT (Jan 2019 – Nov 2022)"
     }
     else {
-        local cond "week >= `breakdate'"
+        local cond "date >= `breakdate'"
         local title "Post-ChatGPT (Nov 2022 – Dec 2024)"
     }
 

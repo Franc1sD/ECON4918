@@ -21,9 +21,8 @@ Steps:
 
 use "$data/weekly_panel.dta", clear
 
-gen week = wofd(date)
-format week %tw
-tsset week
+format date %td
+tsset date, delta(7)
 
 * ── 1. Lag Order Selection ───────────────────────────────────────────────────
 di _newline "--- LAG ORDER SELECTION ---"

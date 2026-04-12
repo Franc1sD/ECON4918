@@ -144,15 +144,9 @@ dta_path = os.path.join(PROC, 'weekly_panel.dta')
 panel_stata = panel.reset_index()
 panel_stata['date'] = pd.to_datetime(panel_stata['date'])
 
-# Add Stata-format weekly date as integer (weeks since 1960w1)
-# Stata epoch for weekly: week 0 = week containing 1960-01-01
-epoch = pd.Timestamp('1960-01-01')
-panel_stata['week'] = ((panel_stata['date'] - epoch).dt.days // 7).astype(int)
-
 # Variable labels for Stata
 variable_labels = {
-    'date':         'Friday date (end of week)',
-    'week':         'Stata weekly date (%tw)',
+    'date':         'Friday date (end of week) — use wofd(date) to get %tw week',
     'nvda_ret':     'NVDA log weekly return',
     'ndx_ret':      'Nasdaq-100 log weekly return',
     'nvda_idret':   'NVDA idiosyncratic return (nvda - ndx)',

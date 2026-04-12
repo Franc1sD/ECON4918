@@ -38,7 +38,7 @@ capture mkdir "$figs"
 global y       nvda_ret            // primary dependent variable
 global gt      dgtrend_nvda        // primary attention variable (stationary)
 global controls "ndx_ret vix log_vol"
-global breakdate = weekly("2022w48", "YW")  // week of 2022-11-28 ≈ ChatGPT launch
+global breakdate = date("2022-11-30", "YMD") // ChatGPT launch date (daily format)
 
 * ── Run analysis modules ──────────────────────────────────────────────────────
 log using "$results/full_analysis.log", replace text
