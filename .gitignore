@@ -13,7 +13,8 @@ data/processed/
 *.smcl
 *.stswp
 *.~do
-results/irf_*.irf          # IRF binary sets (re-created by do-files)
+# IRF binary sets (re-created by do-files)
+results/irf_*.irf
 
 # ── Stata graph files (PNG exports tracked; .gph binaries are not) ────────────
 *.gph
@@ -54,9 +55,7 @@ htmlcov/
 .pdm-python
 .pdm-build/
 
-# ── Results (all outputs are regenerated — not tracked) ───────────────────────
-results/
-
 # ── What IS tracked ───────────────────────────────────────────────────────────
 # scripts/     Python data-fetch scripts
 # analysis/    Stata .do files
+paper/

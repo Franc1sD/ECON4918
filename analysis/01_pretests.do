@@ -92,56 +92,6 @@ twoway scatter nvda_ret dgtrend_nvda, ///
     scheme(s2color)
 graph export "$figs/fig3_scatter.png", replace width(1800)
 
-* ── Hook figure: NVDA price index + Google Trends (dual-axis) ────────────────
-* Construct cumulative price index from log returns (base = 100 at first obs)
-gen _cum_logret     = sum(nvda_ret)
-gen nvda_price_idx  = 100 * exp(_cum_logret - _cum_logret[1])
-label var nvda_price_idx "NVDA cumulative return index (Jan 2019 = 100)"
-
-twoway (line nvda_price_idx date, lcolor(navy) lwidth(medthick) yaxis(1)) ///
-       (line gtrend_nvda    date, lcolor(dkgreen) lwidth(medthick) ///
-            lpattern(dash) yaxis(2)), ///
-    xline(`=$breakdate', lcolor(red) lwidth(medthick) lpattern(shortdash)) ///
-    legend(order(1 "NVDA Price Index (left)" 2 "Google Trends: NVDA (right)") ///
-           position(6) rows(1)) ///
-    ytitle("Price Index (Jan 2019 = 100)", axis(1)) ///
-    ytitle("Search Index (0–100)", axis(2)) ///
-    xtitle("") ///
-    title("NVDA Price and Google Search Attention, 2019–2024") ///
-    note("Vertical line = ChatGPT launch (Nov 30, 2022)") ///
-    xlabel(, format(%tdMon_YY) angle(45)) ///
-    scheme(s2color)
-graph export "$figs/fig_hook_dualaxis.png", replace width(2400)
-
-drop _cum_logret nvda_price_idx
-
-* ── Stationarity figure: levels vs. first difference (side-by-side) ──────────
-twoway (line gtrend_nvda date, lcolor(dkgreen) lwidth(thin)), ///
-    xline(`=$breakdate', lcolor(red) lwidth(medthick) lpattern(shortdash)) ///
-    xtitle("") ytitle("Search Index (0–100)") ///
-    title("Google Trends: NVDA (Levels)") ///
-    note("ADF Z(t) = -2.07, p = 0.258  →  unit root not rejected") ///
-    xlabel(, format(%tdMon_YY) angle(45)) ///
-    scheme(s2color) ///
-    name(g_levels, replace)
-
-twoway (line dgtrend_nvda date, lcolor(dkgreen) lwidth(thin)), ///
-    xline(`=$breakdate', lcolor(red) lwidth(medthick) lpattern(shortdash)) ///
-    yline(0, lcolor(black) lwidth(thin)) ///
-    xtitle("") ytitle("ΔSearch Index") ///
-    title("ΔGoogle Trends: NVDA (First Difference)") ///
-    note("ADF Z(t) = -9.13, p < 0.001  →  stationary") ///
-    xlabel(, format(%tdMon_YY) angle(45)) ///
-    scheme(s2color) ///
-    name(g_diff, replace)
-
-graph combine g_levels g_diff, rows(1) ///
-    title("Unit Root Correction: Google Trends Before and After First-Differencing") ///
-    xsize(14) ysize(5)
-graph export "$figs/fig_stationarity.png", replace width(2800)
-
-graph drop g_levels g_diff
-
 * ── 5. Quandt-Andrews Unknown Breakpoint Test ────────────────────────────────
 di _newline "--- QUANDT-ANDREWS STRUCTURAL BREAK TEST ---"
 di "Trims 15% from each end; tests all interior points"
@@ -151,29 +101,11 @@ di ""
 reg nvda_ret L(1/2).nvda_ret L(1/2).dgtrend_nvda $controls
 
 * Quandt-Andrews test (requires Stata 14+)
-* trim(20) = 20% trimming; note: integer percent, not decimal
-capture estat sbsingle, trim(20)
-if _rc == 0 {
-    * r(breakdate) returns a date string or "." if no clear break is identified
-    local bd_str = r(breakdate)
-    di "  Supremum Wald = " %6.4f r(chi2_swald) ",  p = " %5.4f r(p_swald)
-
-    if "`bd_str'" == "." | "`bd_str'" == "" {
-        di "  No statistically significant break found"
-        di "  ChatGPT date retained as theory-motivated split (Chow test below)"
-        global qlr_breakdate   // unset; robustness section will note no alt date
-    }
-    else {
-        global qlr_breakdate = date("`bd_str'", "DMY")
-        di "  QLR-estimated break: " %td $qlr_breakdate " (`bd_str')"
-        di "  ChatGPT launch date: " %td $breakdate
-        di "  Difference (weeks):  " ($qlr_breakdate - $breakdate) / 7
-    }
-}
-else {
-    di "  Note: estat sbsingle failed (rc=" _rc "). Try a simpler specification."
+* trim(0.20) avoids collinearity in very small boundary sub-samples
+capture estat sbsingle, trim(0.20)
+if _rc != 0 {
+    di "  Note: estat sbsingle failed (r(`_rc')). Try a simpler specification."
     di "  Falling back to manual Chow test below."
-    global qlr_breakdate   // leave unset; 05_robustness.do checks for empty string
 }
 
 * ── 6. Chow Test at ChatGPT Launch ──────────────────────────────────────────

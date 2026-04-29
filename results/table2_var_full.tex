@@ -1,0 +1,41 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{VAR(2) Full-Sample Estimates}
+\begin{tabular}{l*{2}{c}}
+\toprule
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}\\
+                    &\multicolumn{1}{c}{NVDA Return}&\multicolumn{1}{c}{ΔSearch Volume}\\
+\midrule
+L.NVDA log weekly return&      0.0563         &      3.6532         \\
+                    &    (0.0353)         &    (6.4213)         \\
+\addlinespace
+L2.NVDA log weekly return&     -0.0327         &     15.0612\sym{**} \\
+                    &    (0.0352)         &    (6.3971)         \\
+\addlinespace
+L.First diff of gtrend\_nvda&     -0.0000         &     -0.5737\sym{***}\\
+                    &    (0.0003)         &    (0.0543)         \\
+\addlinespace
+L2.First diff of gtrend\_nvda&      0.0007\sym{**} &     -0.2539\sym{***}\\
+                    &    (0.0003)         &    (0.0546)         \\
+\addlinespace
+Nasdaq-100 log weekly return&      1.6666\sym{***}&     14.3265         \\
+                    &    (0.0733)         &   (13.3274)         \\
+\addlinespace
+VIX weekly average  &      0.0000         &     -0.0676         \\
+                    &    (0.0003)         &    (0.0603)         \\
+\addlinespace
+Log NVDA weekly trading volume&      0.0176\sym{***}&      5.9221\sym{***}\\
+                    &    (0.0062)         &    (1.1329)         \\
+\addlinespace
+=1 after ChatGPT launch (2022-11-30)&      0.0086\sym{*}  &      0.0961         \\
+                    &    (0.0049)         &    (0.8973)         \\
+\addlinespace
+Constant            &     -0.3760\sym{***}&   -125.6293\sym{***}\\
+                    &    (0.1315)         &   (23.8993)         \\
+\midrule
+Observations        &         309         &         309         \\
+\bottomrule
+\multicolumn{3}{l}{\footnotesize Standard errors in parentheses. * p<0.10, ** p<0.05, *** p<0.01. Exogenous controls: NDX return, VIX, log volume, post-ChatGPT dummy.}\\
+\multicolumn{3}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

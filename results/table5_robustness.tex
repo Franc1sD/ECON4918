@@ -1,0 +1,65 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Robustness Checks — Return Equation}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{Alt. keyword}&\multicolumn{1}{c}{VAR(1)}&\multicolumn{1}{c}{VAR(4)}&\multicolumn{1}{c}{Idiosyncratic ret.}\\
+\midrule
+L.NVDA log weekly return&      0.0430         &      0.0551         &      0.0594\sym{*}  &                     \\
+                    &    (0.0352)         &    (0.0354)         &    (0.0355)         &                     \\
+\addlinespace
+L2.NVDA log weekly return&     -0.0319         &                     &     -0.0233         &                     \\
+                    &    (0.0351)         &                     &    (0.0352)         &                     \\
+\addlinespace
+L3.NVDA log weekly return&                     &                     &     -0.0178         &                     \\
+                    &                     &                     &    (0.0350)         &                     \\
+\addlinespace
+L4.NVDA log weekly return&                     &                     &      0.0118         &                     \\
+                    &                     &                     &    (0.0349)         &                     \\
+\addlinespace
+L.First diff of gtrend\_buy&      0.0004         &                     &                     &                     \\
+                    &    (0.0004)         &                     &                     &                     \\
+\addlinespace
+L2.First diff of gtrend\_buy&      0.0010\sym{***}&                     &                     &                     \\
+                    &    (0.0004)         &                     &                     &                     \\
+\addlinespace
+Nasdaq-100 log weekly return&      1.6690\sym{***}&      1.6773\sym{***}&      1.6814\sym{***}&                     \\
+                    &    (0.0733)         &    (0.0735)         &    (0.0727)         &                     \\
+\addlinespace
+VIX weekly average  &      0.0000         &      0.0000         &     -0.0001         &     -0.0004         \\
+                    &    (0.0003)         &    (0.0003)         &    (0.0003)         &    (0.0004)         \\
+\addlinespace
+Log NVDA weekly trading volume&      0.0171\sym{***}&      0.0184\sym{***}&      0.0227\sym{***}&      0.0140\sym{**} \\
+                    &    (0.0062)         &    (0.0062)         &    (0.0063)         &    (0.0070)         \\
+\addlinespace
+=1 after ChatGPT launch (2022-11-30)&      0.0083\sym{*}  &      0.0085\sym{*}  &      0.0075         &      0.0075         \\
+                    &    (0.0049)         &    (0.0050)         &    (0.0049)         &    (0.0056)         \\
+\addlinespace
+L.First diff of gtrend\_nvda&                     &     -0.0003         &     -0.0001         &     -0.0001         \\
+                    &                     &    (0.0003)         &    (0.0003)         &    (0.0003)         \\
+\addlinespace
+L2.First diff of gtrend\_nvda&                     &                     &      0.0005         &      0.0009\sym{***}\\
+                    &                     &                     &    (0.0004)         &    (0.0003)         \\
+\addlinespace
+L3.First diff of gtrend\_nvda&                     &                     &     -0.0003         &                     \\
+                    &                     &                     &    (0.0004)         &                     \\
+\addlinespace
+L4.First diff of gtrend\_nvda&                     &                     &     -0.0002         &                     \\
+                    &                     &                     &    (0.0003)         &                     \\
+\addlinespace
+L.NVDA idiosyncratic return (nvda - ndx)&                     &                     &                     &      0.1267\sym{**} \\
+                    &                     &                     &                     &    (0.0579)         \\
+\addlinespace
+L2.NVDA idiosyncratic return (nvda - ndx)&                     &                     &                     &     -0.0763         \\
+                    &                     &                     &                     &    (0.0580)         \\
+\addlinespace
+Constant            &     -0.3643\sym{***}&     -0.3942\sym{***}&     -0.4807\sym{***}&     -0.2880\sym{*}  \\
+                    &    (0.1316)         &    (0.1313)         &    (0.1330)         &    (0.1486)         \\
+\midrule
+Observations        &         309         &         310         &         307         &         309         \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses. * p<0.10, ** p<0.05, *** p<0.01. All models estimated with OLS on the return equation.}\\
+\multicolumn{5}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

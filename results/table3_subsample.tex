@@ -1,0 +1,38 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{VAR Return Equation: Pre vs. Post ChatGPT}
+\begin{tabular}{l*{2}{c}}
+\toprule
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}\\
+                    &\multicolumn{1}{c}{Pre-ChatGPT}&\multicolumn{1}{c}{Post-ChatGPT}\\
+\midrule
+L.NVDA log weekly return&      0.0615         &      0.0152         \\
+                    &    (0.0433)         &    (0.0631)         \\
+\addlinespace
+L2.NVDA log weekly return&     -0.0033         &     -0.1020         \\
+                    &    (0.0425)         &    (0.0631)         \\
+\addlinespace
+L.First diff of gtrend\_nvda&      0.0015         &     -0.0001         \\
+                    &    (0.0012)         &    (0.0003)         \\
+\addlinespace
+L2.First diff of gtrend\_nvda&      0.0010         &      0.0007\sym{**} \\
+                    &    (0.0012)         &    (0.0003)         \\
+\addlinespace
+Nasdaq-100 log weekly return&      1.5863\sym{***}&      1.8752\sym{***}\\
+                    &    (0.0833)         &    (0.1567)         \\
+\addlinespace
+VIX weekly average  &      0.0001         &      0.0005         \\
+                    &    (0.0003)         &    (0.0012)         \\
+\addlinespace
+Log NVDA weekly trading volume&      0.0081         &      0.0376\sym{***}\\
+                    &    (0.0075)         &    (0.0113)         \\
+\addlinespace
+Constant            &     -0.1740         &     -0.8027\sym{***}\\
+                    &    (0.1579)         &    (0.2401)         \\
+\midrule
+Observations        &         200         &         107         \\
+\bottomrule
+\multicolumn{3}{l}{\footnotesize Standard errors in parentheses. * p<0.10, ** p<0.05, *** p<0.01.}\\
+\multicolumn{3}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

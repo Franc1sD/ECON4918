@@ -1,0 +1,47 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Robustness: Nonlinearities and Interactions}
+\begin{tabular}{l*{3}{c}}
+\toprule
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}\\
+                    &\multicolumn{1}{c}{Attention spike}&\multicolumn{1}{c}{Asymmetric response}&\multicolumn{1}{c}{Attention × VIX}\\
+\midrule
+hi\_attention        &      0.0106\sym{**} &                     &                     \\
+                    &    (0.0051)         &                     &                     \\
+\addlinespace
+Nasdaq-100 log weekly return&      0.2433\sym{***}&     12.1548         &      1.6775\sym{***}\\
+                    &    (0.0716)         &   (13.8582)         &    (0.0738)         \\
+\addlinespace
+VIX weekly average  &      0.0011\sym{***}&     -0.0698         &      0.0000         \\
+                    &    (0.0003)         &    (0.0620)         &    (0.0003)         \\
+\addlinespace
+Log NVDA weekly trading volume&      0.0289\sym{***}&      5.3841\sym{***}&      0.0185\sym{***}\\
+                    &    (0.0061)         &    (1.1878)         &    (0.0063)         \\
+\addlinespace
+=1 after ChatGPT launch (2022-11-30)&      0.0038         &      0.0667         &      0.0089\sym{*}  \\
+                    &    (0.0051)         &    (0.9280)         &    (0.0050)         \\
+\addlinespace
+L.NVDA log weekly return&                     &     10.7112         &      0.0530         \\
+                    &                     &    (8.8717)         &    (0.0357)         \\
+\addlinespace
+L2.NVDA log weekly return&                     &                     &     -0.0194         \\
+                    &                     &                     &    (0.0351)         \\
+\addlinespace
+neg\_ret\_x           &                     &    -15.0311         &                     \\
+                    &                     &   (13.5847)         &                     \\
+\addlinespace
+L.First diff of gtrend\_nvda&                     &     -0.4727\sym{***}&     -0.0006         \\
+                    &                     &    (0.0510)         &    (0.0004)         \\
+\addlinespace
+gt\_vix              &                     &                     &     -0.0004         \\
+                    &                     &                     &    (0.0005)         \\
+\addlinespace
+Constant            &     -0.5961\sym{***}&   -113.9687\sym{***}&     -0.3942\sym{***}\\
+                    &    (0.1295)         &   (25.0533)         &    (0.1322)         \\
+\midrule
+Observations        &         311         &         310         &         309         \\
+\bottomrule
+\multicolumn{4}{l}{\footnotesize Standard errors in parentheses. * p<0.10, ** p<0.05, *** p<0.01.}\\
+\multicolumn{4}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}
