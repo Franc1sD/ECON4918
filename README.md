@@ -59,7 +59,6 @@ ECON4918/
 │   ├── raw/                   # Raw CSVs (gitignored — regenerate with 01_fetch_data.py)
 │   └── processed/             # weekly_panel.csv / .dta (gitignored — regenerate with 02_build_dataset.py)
 │
-<<<<<<< HEAD
 ├── paper/
 │   └── main.tex               # Full paper (inline MLA-style citations, no BibTeX)
 │
@@ -73,11 +72,6 @@ ECON4918/
 │   ├── table4_oos.tex
 │   ├── table5_robustness.tex
 │   └── table6_robustness2.tex
-=======
-├── results/
-│   ├── figures/               # PNG exports (tracked in git)
-│   └── *.tex                  # LaTeX tables (tracked in git)
->>>>>>> parent of 69564d8 (feat: Added QLR analysis into the paper and code change)
 │
 └── README.md
 ```
@@ -126,46 +120,24 @@ do "analysis/04_oos_forecast.do"
 do "analysis/05_robustness.do"
 ```
 
-**First-time Stata users:** install required packages:
-```stata
-ssc install estout     // for esttab (result tables)
-ssc install kpss       // for KPSS stationarity test
-ssc install coefplot   // for coefficient comparison plot
-```
 
 ---
 
 ## Methodology
 
-### VAR System
+The core model is a bivariate VAR estimated on weekly data, with NVDA log returns and the first-differenced Google Trends index as the two endogenous variables. Each equation includes lags of both variables plus exogenous controls (Nasdaq-100 return, VIX, log trading volume, and a post-ChatGPT dummy). The system lets us test whether search activity predicts returns, whether returns feed back into search, and how those dynamics shifted after November 2022.
 
-The core model is a bivariate VAR with exogenous controls:
-
-**Equation 1 (Return equation):**
-$$r_t^{NVDA} = \alpha_1 + \sum_{k=1}^{p} \beta_k r_{t-k}^{NVDA} + \sum_{k=1}^{p} \gamma_k \Delta S_{t-k} + \delta' \mathbf{X}_t + \varepsilon_{1t}$$
-
-**Equation 2 (Search equation):**
-$$\Delta S_t = \alpha_2 + \sum_{k=1}^{p} \phi_k r_{t-k}^{NVDA} + \sum_{k=1}^{p} \psi_k \Delta S_{t-k} + \lambda' \mathbf{X}_t + \varepsilon_{2t}$$
-
-where $r_t^{NVDA}$ is the log weekly return, $\Delta S_t$ is the first-differenced Google Trends index, and $\mathbf{X}_t = (\text{NDX return}, \text{VIX}, \log\text{Volume}, \text{post\_chatgpt})$.
-
-### Pre-estimation Checks
-- ADF and KPSS unit root tests (Google Trends in levels → unit root → first-differenced)
-- Quandt-Andrews unknown structural break test
-- Chow test at Nov 2022
-- ARCH-LM test for volatility clustering
-
-### Post-estimation
-- Granger causality (bidirectional, `vargranger`)
-- Orthogonalized IRFs (Cholesky ordering: ΔSearch → Return)
-- Forecast Error Variance Decomposition (FEVD)
-- Recursive OOS forecasting with Clark-West (2006) test
+Pre-estimation checks confirm stationarity (ADF/KPSS), identify the structural break (Quandt-Andrews + Chow test), and test for volatility clustering (ARCH-LM). Post-estimation diagnostics include bidirectional Granger causality tests, orthogonalized impulse response functions, forecast error variance decomposition, and a recursive out-of-sample forecast comparison using the Clark-West (2006) test.
 
 ---
 
 ## Key References
 
-- Da, Z., Engelberg, J., & Gao, P. (2011). In search of attention. *Journal of Finance*, 66(5), 1461–1499.
-- Baker, M., & Wurgler, J. (2007). Investor sentiment in the stock market. *Journal of Economic Perspectives*, 21(2), 129–151.
+- Barber, B. M., & Odean, T. (2008). All that glitters: The effect of attention and news on the buying behavior of individual and institutional investors. *Review of Financial Studies*, 21(2), 785–818.
+- Brogaard, J., Hendershott, T., & Riordan, R. (2022). High-frequency trading and price discovery. *Review of Financial Studies*, 35(4), 1665–1703.
 - Clark, T. E., & West, K. D. (2006). Using out-of-sample mean squared prediction errors to test the martingale difference hypothesis. *Journal of Econometrics*, 135(1–2), 155–186.
-- Vlastakis, N., & Markellos, R. N. (2012). Information demand and stock market volatility. *Journal of Banking & Finance*, 36(6), 1808–1821.
+- Da, Z., Engelberg, J., & Gao, P. (2011). In search of attention. *Journal of Finance*, 66(5), 1461–1499.
+- Han, B., Hirshleifer, D., & Walden, J. (2023). Social transmission bias and investor behavior. *Journal of Financial and Quantitative Analysis*, 58(1), 1–33.
+- Kim, O., & Verrecchia, R. E. (2019). Liquidity and volume around earnings announcements. *Journal of Accounting and Economics*, 41(1–2), 41–67.
+- Merton, R. C. (1987). A simple model of capital market equilibrium with incomplete information. *Journal of Finance*, 42(3), 483–510.
+- Preis, T., Moat, H. S., & Stanley, H. E. (2013). Quantifying trading behavior in financial markets using Google Trends. *Scientific Reports*, 3, 1684.
