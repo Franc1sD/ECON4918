@@ -112,6 +112,39 @@ estimates store eq_vix_int
 
 drop vix_std gt_vix hi_attention
 
+* ── 7. QLR-Estimated Break vs. ChatGPT Date ──────────────────────────────────
+di _newline "=== ROBUSTNESS 7: Alternative break date from QLR test ==="
+
+if "$qlr_breakdate" == "" {
+    di "  QLR test found no statistically significant break (see 01_pretests.do output)."
+    di "  ChatGPT date is the sole split; no alternative subsample table produced."
+}
+else {
+    local qlr_bd = $qlr_breakdate
+    di "  QLR-estimated break: " %td `qlr_bd'
+    di "  ChatGPT launch date: " %td $breakdate
+    di "  Difference (weeks):  " (`qlr_bd' - $breakdate) / 7
+
+    foreach period in "pre" "post" {
+        preserve
+        if "`period'" == "pre"  keep if date <  `qlr_bd'
+        if "`period'" == "post" keep if date >= `qlr_bd'
+
+        reg nvda_ret L(1/`p').nvda_ret L(1/`p').dgtrend_nvda ///
+            ndx_ret vix log_vol
+        estimates store eq_qlr_`period'
+        restore
+    }
+
+    esttab eq_qlr_pre eq_qlr_post using "$results/table_qlr_break.tex", ///
+        b(4) se(4) star(* 0.10 ** 0.05 *** 0.01) ///
+        label replace booktabs ///
+        title("Robustness: Subsample Split at QLR-Estimated Break Date") ///
+        mtitles("Pre-QLR break" "Post-QLR break") ///
+        note("Break date estimated by Quandt-Andrews QLR test (estat sbsingle)." ///
+             "Compare to Table 3 which splits at ChatGPT launch (Nov 30, 2022).")
+}
+
 * ── Export Robustness Table ───────────────────────────────────────────────────
 di _newline "--- EXPORT ROBUSTNESS TABLE ---"
 
